@@ -2,38 +2,39 @@ FROM ubuntu:18.04
 
 ARG USERNAME
 
-RUN apt-get update  \
-	&& apt-get -y install apt-transport-https \
-	     ca-certificates \
-	     curl \
-	     gnupg2 \
-	     software-properties-common \
-	&& curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey \
-	&& add-apt-repository \
-	   "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-	   $(lsb_release -cs) \
-	   stable" \
-	&& apt-get update \
-	# tools
-	&& apt-get -y install \
-	    docker-ce \
-	    git \
-	    sshpass \
-	    dos2unix \
-	    zsh \
-	    curl \
-	    xclip \
-	    vim \
-	    wget \
-	    sudo \
+RUN set -xe \
+    && apt-get update  \
+    && apt-get -y install apt-transport-https \
+         ca-certificates \
+         curl \
+         gnupg2 \
+         software-properties-common \
+    && curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey \
+    && add-apt-repository \
+       "deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
+       $(lsb_release -cs) \
+       stable" \
+    && apt-get update \
+    && apt-get -y install \
+        docker-ce \
+        git \
+        sshpass \
+        dos2unix \
+        zsh \
+        curl \
+        xclip \
+        vim \
+        wget \
+        sudo \
         # dev
         python3-pip \
         # java
         default-jre default-jdk maven \
         # golang
         golang \
-    # python libs
+        # python libs
     && pip3 install awscli \
+    # clean everything
     && apt-get clean  \
     && apt-get autoclean \
     && apt-get autoremove -y \
@@ -65,20 +66,15 @@ WORKDIR "/home/${USERNAME}/"
 
 RUN PATH="$PATH:/usr/bin/zsh" \
     && wget https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | zsh || true \
-    && echo "alias mpack='mnv package' >> ~/.zshrc"
-    && echo "alias gs='git status' >> ~/.zshrc"
-    && echo "alias gr='cd ~/my-git-repos' >> ~/.zshrc"
+    && echo "alias mpack='mvn package'" >> ~/.zshrc \
+    && echo "alias gs='git status'" >> ~/.zshrc \
+    && echo "alias gr='cd ~/my-git-repos'" >> ~/.zshrc
 
 
 ENTRYPOINT ["/bin/zsh"]
 
 
-#ranger autojump direnv ccat
-
-#mpack='mvn package'
-#gs='git status'
-#gr='cd ~/my-git-repos'
-
+#ranger autojump direnv tmux
 
 #export GOROOT=$HOME/go
 #export GOPATH=$HOME/work
